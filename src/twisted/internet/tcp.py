@@ -565,11 +565,13 @@ class BaseClient(_BaseBaseClient, _TLSClientMixin, Connection):
         del self.socket, self.fileno
 
 
-    def createInternetSocket(self):
+    def createInternetSocket(self, socket_family=None):
         """(internal) Create a non-blocking socket using
         self.addressFamily, self.socketType.
         """
-        s = socket.socket(self.addressFamily, self.socketType)
+        if not socket_family:
+            socket_family = self.addressFamily
+        s = socket.socket(socket_family, self.socketType)
         s.setblocking(0)
         fdesc._setCloseOnExec(s.fileno())
         return s
