@@ -735,7 +735,12 @@ class _BaseTCPClient(object):
         else:
             self._requiresResolution = True
         try:
-            skt = self.createInternetSocket()
+            
+            if abstract.isIPv6Address(bindAddress[0]):
+                socket_family = socket.AF_INET6
+            else:
+                socket_family = socket.AF_INET
+            skt = self.createInternetSocket(socket_family)
         except socket.error as se:
             err = error.ConnectBindError(se.args[0], se.args[1])
             whenDone = None
@@ -1338,8 +1343,8 @@ class Port(base.BasePort, _SocketCloser):
         else:
             return "<%s of %s (not listening)>" % (self.__class__, self.factory.__class__)
 
-    def createInternetSocket(self):
-        s = base.BasePort.createInternetSocket(self)
+    def createInternetSocket(self, socket_family=None):
+        s = base.BasePort.createInternetSocket(self, socket_family)
         if platformType == "posix" and sys.platform != "cygwin":
             s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s

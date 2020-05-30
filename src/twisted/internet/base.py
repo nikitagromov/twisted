@@ -1193,8 +1193,10 @@ class BasePort(abstract.FileDescriptor):
     addressFamily = None  # type: socket.AddressFamily
     socketType = None  # type: socket.SocketKind
 
-    def createInternetSocket(self):
-        s = socket.socket(self.addressFamily, self.socketType)
+    def createInternetSocket(self, socket_family=None):
+        if not socket_family:
+            socket_family = self.addressFamily
+        s = socket.socket(socket_family, self.socketType)
         s.setblocking(0)
         fdesc._setCloseOnExec(s.fileno())
         return s
